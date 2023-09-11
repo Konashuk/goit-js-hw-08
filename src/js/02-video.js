@@ -1,13 +1,14 @@
 import Player from '@vimeo/player';
+import throttle from 'lodash.throttle';
 
 const iframe = document.querySelector(`iframe`);
 const player = new Player(iframe);
 
 const LS_KEY = 'videoplayer-current-time';
 
-iframe.addEventListener('load', savedTimeToPlay);
+window.addEventListener('load', savedTimeToPlay);
 
-player.on('timeupdate', getTimeInLs);
+player.on('timeupdate', throttle(getTimeInLs, 1000));
 
 function getTimeInLs(data) {
   const currentSeco = data.seconds;
@@ -20,14 +21,6 @@ function savedTimeToPlay() {
   if (savedTime) {
     const currentTime = savedTime;
 
-    player
-      .setCurrentTime(currentTime)
-      .then(function () {
-        console.log('Почати відтворення з часу:', currentTime);
-        player.play();
-      })
-      .catch(function (error) {
-        console.log('Помилка встановлення часу:', error);
-      });
+    player.setCurrentTime(currentTime);
   }
 }
